@@ -1,0 +1,25 @@
+{
+    "name": "leaseweb/vsphere-client-bundle",
+    "type": "proprietary",
+    "description": "VMWare vSphere API Client Bundle",
+    "keywords": ["API","vSphere","VMWare","Symfony2"],
+    "homepage": "http://www.leaseweblabs.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Gabriel Anca",
+            "email": "g.ancacorral@tech.leaseweb.com"
+        },
+        {
+            "name": "Ricardo Nogueira",
+            "email": "r.nogueira@tech.leaseweb.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.6",
+        "leaseweb/vmware-php-sdk": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Lsw\\VsphereClientBundle": "src/" }
+    }
+}
