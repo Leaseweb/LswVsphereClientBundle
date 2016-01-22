@@ -14,11 +14,17 @@ class ResourcePool
     /** @var string $name */
     private $name;
 
-    /** @var int Memory allocated (in MB) */
+    /** @var int $memoryAllocated Memory allocated (in MB) */
     private $memoryAllocated;
 
-    /** @var int $cpuAllocated (in MHz) */
+    /** @var int $cpuAllocated CPU allocated (in MHz) */
     private $cpuAllocated;
+
+    /** @var int $memoryFree Memory available (in MB) */
+    private $memoryFree;
+
+    /** @var int $cpuFree CPU available (in MHz) */
+    private $cpuFree;
 
     /**
      * @return string
@@ -89,6 +95,42 @@ class ResourcePool
     public function setCpuAllocated($cpuAllocated)
     {
         $this->cpuAllocated = $cpuAllocated;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMemoryFree()
+    {
+        return $this->memoryFree;
+    }
+
+    /**
+     * @param int $memoryFree
+     * @return ResourcePool
+     */
+    public function setMemoryFree($memoryFree)
+    {
+        $this->memoryFree = $memoryFree;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCpuFree()
+    {
+        return $this->cpuFree;
+    }
+
+    /**
+     * @param int $cpuFree
+     * @return ResourcePool
+     */
+    public function setCpuFree($cpuFree)
+    {
+        $this->cpuFree = $cpuFree;
         return $this;
     }
 }

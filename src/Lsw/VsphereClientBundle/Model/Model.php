@@ -2,7 +2,7 @@
 
 namespace Lsw\VsphereClientBundle\Model;
 
-use Vmwarephp\Vhost;
+use Vmwarephp\Service;
 
 /**
  * Class Model
@@ -10,15 +10,15 @@ use Vmwarephp\Vhost;
  */
 abstract class Model
 {
-    /** @var Vhost $vhost */
-    protected $vhost;
+    /** @var Service $service */
+    protected $service;
 
     /**
      * Model constructor.
-     * @param Vhost $vhost
+     * @param Service $service
      */
-    public function __construct(Vhost $vhost)
+    public function __construct(Service $service)
     {
-        $this->vhost = $vhost;
+        $this->service = $service;
     }
 }

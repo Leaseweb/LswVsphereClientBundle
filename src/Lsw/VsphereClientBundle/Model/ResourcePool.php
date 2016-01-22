@@ -18,8 +18,9 @@ class ResourcePool extends Model
      */
     public function findById($id)
     {
+        // Get the Resource Pool information
         try {
-            $resourcePoolResponse = $this->vhost->findOneManagedObject(
+            $resourcePoolResponse = $this->service->findOneManagedObject(
                 'ResourcePool',
                 $id,
                 ['name', 'config', 'resourcePool']
@@ -28,23 +29,44 @@ class ResourcePool extends Model
             throw new VsphereObjectNotFoundException($e->getMessage());
         }
 
-        $resourcePool = new ResourcePoolEntity();
-
         /** @var \ResourceConfigSpec $rpConfig */
         $rpConfig = $resourcePoolResponse->config;
 
-        /** @var \ResourceAllocationInfo $cpuAllocation */
-        $cpuAllocation = $rpConfig->cpuAllocation;
+        // Allocated CPU and memory
+        $cpuAllocated = $rpConfig->cpuAllocation->limit;
+        $memoryAllocated = $rpConfig->memoryAllocation->limit;
 
-        /** @var \ResourceAllocationInfo $memoryAllocation */
-        $memoryAllocation = $rpConfig->memoryAllocation;
+        // Free CPU and memory
+        $cpuFree = $cpuAllocated;
+        $memoryFree = $memoryAllocated;
+        $subResourcePools = $resourcePoolResponse->resourcePool;
+        foreach ($subResourcePools as $subResourcePool) {
+            $cpuFree = $this->substractResource($cpuFree, $subResourcePool->config->cpuAllocation->limit);
+            $memoryFree = $this->substractResource($memoryFree, $subResourcePool->config->memoryAllocation->limit);
+        }
 
+        // Create the Resource Pool Entity
+        $resourcePool = new ResourcePoolEntity();
         $resourcePool
             ->setId($id)
             ->setName($resourcePoolResponse->name)
-            ->setCpuAllocated($cpuAllocation->limit)
-            ->setMemoryAllocated($memoryAllocation->limit);
+            ->setCpuAllocated($cpuAllocated)
+            ->setMemoryAllocated($memoryAllocated)
+            ->setCpuFree($cpuFree)
+            ->setMemoryFree($memoryFree);
 
         return $resourcePool;
+    }
+
+    /**
+     * Substracts allocated resources from a total count. It filters resources smaller than zero (=unlimited)
+     * @param int|float $resource
+     * @param int|float $toSubstract
+     *
+     * @return int|float
+     */
+    private function substractResource($resource, $toSubstract)
+    {
+        return ($toSubstract > 0) ? ($resource - $toSubstract) : $resource;
     }
 }

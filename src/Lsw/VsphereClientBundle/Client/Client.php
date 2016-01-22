@@ -13,10 +13,8 @@ use Vmwarephp\Vhost;
  */
 class Client
 {
-    /**
-     * @var Vhost
-     */
-    private $vhost;
+    /** @var \Vmwarephp\Service $service */
+    private $service;
 
     /**
      * Configures the API client
@@ -26,11 +24,13 @@ class Client
      */
     public function configure(ClientConfiguration $configuration, Credentials $credentials)
     {
-        $this->vhost = new Vhost(
+        $vhost = new Vhost(
             sprintf('%s:%d', $configuration->getEndpoint(), $configuration->getPort()),
             $credentials->getUsername(),
             $credentials->getPassword()
         );
+
+        $this->service = $vhost->getService();
 
         return $this;
     }
@@ -42,7 +42,7 @@ class Client
     public function getResourcePool($id)
     {
         try {
-            $resourcePoolModel = new ResourcePool($this->vhost);
+            $resourcePoolModel = new ResourcePool($this->service);
             return $resourcePoolModel->findById($id);
         } catch (VsphereObjectNotFoundException $e) {
             return null;
