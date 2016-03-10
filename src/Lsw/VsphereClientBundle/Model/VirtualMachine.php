@@ -24,7 +24,7 @@ class VirtualMachine extends Model
             $virtualMachineResponse = $this->service->findOneManagedObject(
                 'VirtualMachine',
                 $id,
-                ['name', 'network']
+                ['name', 'guest']
             );
         } catch (\Exception $e) {
             throw new VsphereObjectNotFoundException($e->getMessage());
