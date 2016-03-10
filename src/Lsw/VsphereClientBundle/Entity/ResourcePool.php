@@ -6,7 +6,7 @@ namespace Lsw\VsphereClientBundle\Entity;
  * Class ResourcePool
  * @package Lsw\VsphereClientBundle\Entity
  */
-class ResourcePool
+class ResourcePool extends Entity
 {
     /** @var string $id */
     private $id;
@@ -25,6 +25,9 @@ class ResourcePool
 
     /** @var int $cpuFree CPU available (in MHz) */
     private $cpuFree;
+
+    /** @var array $virtualMachineIds Child Virtual Machine ids */
+    private $virtualMachineIds;
 
     /**
      * @return string
@@ -131,6 +134,24 @@ class ResourcePool
     public function setCpuFree($cpuFree)
     {
         $this->cpuFree = $cpuFree;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getVirtualMachineIds()
+    {
+        return $this->virtualMachineIds;
+    }
+
+    /**
+     * @param array $virtualMachineIds
+     * @return ResourcePool
+     */
+    public function setVirtualMachineIds($virtualMachineIds)
+    {
+        $this->virtualMachineIds = $virtualMachineIds;
         return $this;
     }
 }
