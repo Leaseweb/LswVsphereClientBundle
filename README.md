@@ -1,7 +1,17 @@
 LswVsphereClientBundle
 ========================
 
-This is a bundle for Symfony that adds the ability to communicate with VMWare vSphere API.
+This project adds the ability to Symfony and Slim Frameworks to communicate with VMWare vSphere API.
+
+It makes use of [our personal and updated fork](https://github.com/LeaseWeb/vmwarephp) of the [vadimcomanescu/vmwarephp](https://github.com/vadimcomanescu/vmwarephp) vSphere API client.
+
+This is still work in progress, a lot has to be done yet, but it is a great start for anyone that needs to interact with vSphere's complex RMI-SOAP API. If you are missing any functionality, feel free to make a pull request. You can find vSphere API documentation [here](http://pubs.vmware.com/vsphere-60/topic/com.vmware.wssdk.apiref.doc/right-pane.html).
+
+# Requirements
+* PHP >= 5.5.
+* Symfony / Slim framework project (it can work with other frameworks, but we only tested in these two).
+* Composer.
+* PHP SOAP extension.
 
 # Installation instructions
 To install this bundle in a project, please follow these steps:
@@ -69,22 +79,22 @@ private function getVsphereClient()
     $vSphereService = $this->container->get('lsw.vsphere_api_client');
 
     $vSphereConfiguration = new VsphereClientConfiguration(
-        $this->container->getParameter('vcrp01nl_vcenter_host'),
-        (int)$this->container->getParameter('vcrp01nl_vcenter_port')
+        'vcenter_host.mycompany.com',
+        '443'
     );
 
     $vSphereCredentials = new VsphereCredentials(
-        $this->container->getParameter('vcrp01nl_vcenter_username'),
-        $this->container->getParameter('vcrp01nl_vcenter_password')
+        'username',
+        'password'
     );
 
     return $vSphereService->configure($vSphereConfiguration, $vSphereCredentials);
 }
 
-public function indexAction(Request $request, $resourcePoolName)
+public function indexAction(Request $request, $resourcePoolId)
 {
     $vSphereAPIClient = $this->getVsphereClient();
-    $resourcePool = $vSphereAPIClient->getResourcePool($resourcePoolName);
+    $resourcePool = $vSphereAPIClient->getResourcePool($resourcePoolId);
     var_dump($resourcePool);
     exit;
 }
