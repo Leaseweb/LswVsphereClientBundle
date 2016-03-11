@@ -71,7 +71,7 @@ class Client
      * @param Entity                    $entity Entity to retrieve the performance from
      * @param PerformanceMetricFilter[] $metricsFilter Metric filters
      *
-     * @return null
+     * @return \Lsw\VsphereClientBundle\Entity\PerformanceSample[]|null
      */
     public function getPerformanceRealTime(Entity $entity, array $metricsFilter = [])
     {
@@ -90,14 +90,14 @@ class Client
      * @param string                    $endDate End date in datetime format (eg 2016-03-08T12:00:00Z)
      * @param int                       $interval Interval in seconds
      *
-     * @return null
+     * @return \Lsw\VsphereClientBundle\Entity\PerformanceSample[]|null
      */
     public function getPerformance(
         Entity $entity,
         array $metricsFilter = [],
         $startDate = null,
         $endDate = null,
-        $interval = 300
+        $interval = PerformanceManager::DEFAULT_INTERVAL
     ) {
         try {
             $performanceManagerModel = new PerformanceManager($this->service);
