@@ -4,6 +4,7 @@ namespace Lsw\VsphereClientBundle\Client;
 
 use Lsw\VsphereClientBundle\Entity\Entity;
 use Lsw\VsphereClientBundle\Exception\VsphereObjectNotFoundException;
+use Lsw\VsphereClientBundle\Exception\VsphereUnknownException;
 use Lsw\VsphereClientBundle\Model\PerformanceManager;
 use Lsw\VsphereClientBundle\Model\ResourcePool;
 use Lsw\VsphereClientBundle\Model\VirtualMachine;
@@ -41,29 +42,36 @@ class Client
 
     /**
      * @param $id
-     * @return \Lsw\VsphereClientBundle\Entity\ResourcePool|null
+     * @return \Lsw\VsphereClientBundle\Entity\ResourcePool
+     * @throws VsphereObjectNotFoundException
      */
     public function getResourcePool($id)
     {
-        try {
-            $resourcePoolModel = new ResourcePool($this->service);
-            return $resourcePoolModel->findById($id);
-        } catch (VsphereObjectNotFoundException $e) {
-            return null;
-        }
+        $resourcePoolModel = new ResourcePool($this->service);
+        return $resourcePoolModel->findById($id);
     }
 
     /**
      * @param $id
-     * @return \Lsw\VsphereClientBundle\Entity\VirtualMachine|null
+     * @return \Lsw\VsphereClientBundle\Entity\VirtualMachine
+     * @throws VsphereObjectNotFoundException
      */
     public function getVirtualMachine($id)
     {
+        $virtualMachineModel = new VirtualMachine($this->service);
+        return $virtualMachineModel->findById($id);
+    }
+
+    /**
+     * @return \Lsw\VsphereClientBundle\Entity\VirtualMachine[]
+     */
+    public function getVirtualMachines()
+    {
         try {
             $virtualMachineModel = new VirtualMachine($this->service);
-            return $virtualMachineModel->findById($id);
+            return $virtualMachineModel->findAll();
         } catch (VsphereObjectNotFoundException $e) {
-            return null;
+            return [];
         }
     }
 
@@ -71,16 +79,13 @@ class Client
      * @param Entity                    $entity Entity to retrieve the performance from
      * @param PerformanceMetricFilter[] $metricsFilter Metric filters
      *
-     * @return \Lsw\VsphereClientBundle\Entity\PerformanceSample[]|null
+     * @return \Lsw\VsphereClientBundle\Entity\PerformanceSample[]
+     * @throws VsphereUnknownException
      */
     public function getPerformanceRealTime(Entity $entity, array $metricsFilter = [])
     {
-        try {
-            $performanceManagerModel = new PerformanceManager($this->service);
-            return $performanceManagerModel->getPerformanceRealTime($entity, $metricsFilter);
-        } catch (VsphereObjectNotFoundException $e) {
-            return null;
-        }
+        $performanceManagerModel = new PerformanceManager($this->service);
+        return $performanceManagerModel->getPerformanceRealTime($entity, $metricsFilter);
     }
 
     /**
@@ -90,20 +95,17 @@ class Client
      * @param string                    $endDate End date in datetime format (eg 2016-03-08T12:00:00Z)
      * @param int                       $interval Interval in seconds
      *
-     * @return \Lsw\VsphereClientBundle\Entity\PerformanceSample[]|null
+     * @return \Lsw\VsphereClientBundle\Entity\PerformanceSample[]
+     * @throws VsphereUnknownException
      */
     public function getPerformance(
         Entity $entity,
         array $metricsFilter = [],
         $startDate = null,
         $endDate = null,
-        $interval = PerformanceManager::DEFAULT_INTERVAL
+        $interval = null
     ) {
-        try {
-            $performanceManagerModel = new PerformanceManager($this->service);
-            return $performanceManagerModel->getPerformance($entity, $metricsFilter, $startDate, $endDate, $interval);
-        } catch (VsphereObjectNotFoundException $e) {
-            return null;
-        }
+        $performanceManagerModel = new PerformanceManager($this->service);
+        return $performanceManagerModel->getPerformance($entity, $metricsFilter, $startDate, $endDate, $interval);
     }
 }

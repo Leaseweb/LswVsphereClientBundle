@@ -30,8 +30,41 @@ class VirtualMachine extends Model
             throw new VsphereObjectNotFoundException($e->getMessage());
         }
 
+        return $this->getVirtualMachineFromManagedObject($virtualMachineResponse);
+    }
+
+    /**
+     * @return VirtualMachineEntity[]
+     * @throws VSphereObjectNotFoundException
+     */
+    public function findAll()
+    {
+        // Get the Virtual Machine information
+        try {
+            $virtualMachinesResponse = $this->service->findAllManagedObjects(
+                'VirtualMachine',
+                ['name', 'guest']
+            );
+        } catch (\Exception $e) {
+            throw new VsphereObjectNotFoundException($e->getMessage());
+        }
+
+        // Gather the information for each of the virtual machines
+        $virtualMachines = [];
+        foreach ($virtualMachinesResponse as $virtualMachine) {
+            $virtualMachines[] = $this->getVirtualMachineFromManagedObject($virtualMachine);
+        }
+        return $virtualMachines;
+    }
+
+    /**
+     * @param $managedObject
+     * @return VirtualMachineEntity
+     */
+    private function getVirtualMachineFromManagedObject($managedObject)
+    {
         // Get Nics information
-        $nics = $virtualMachineResponse->guest->net;
+        $nics = $managedObject->guest->net;
         $guestNics = [];
         if (!empty($nics)) {
             foreach ($nics as $nic) {
@@ -47,10 +80,10 @@ class VirtualMachine extends Model
         // Create the Virtual Machine Object
         $virtualMachine = new VirtualMachineEntity();
         $virtualMachine
-            ->setId($id)
-            ->setName($virtualMachineResponse->name)
+            ->setId($managedObject->reference->_)
+            ->setName($managedObject->name)
             ->setGuestNics($guestNics)
-            ->setManagedObject($virtualMachineResponse);
+            ->setManagedObject($managedObject);
         return $virtualMachine;
     }
 }

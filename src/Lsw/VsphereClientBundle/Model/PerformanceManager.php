@@ -4,6 +4,7 @@ namespace Lsw\VsphereClientBundle\Model;
 
 use Lsw\VsphereClientBundle\Entity\Entity;
 use Lsw\VsphereClientBundle\Entity\PerformanceSample;
+use Lsw\VsphereClientBundle\Exception\VsphereUnknownException;
 use Lsw\VsphereClientBundle\Util\PerformanceMetricFilter;
 use Vmwarephp\ManagedObject;
 
@@ -13,13 +14,12 @@ use Vmwarephp\ManagedObject;
  */
 class PerformanceManager extends Model
 {
-    const DEFAULT_INTERVAL = 300; // 5 minutes
-
     /**
      * @param Entity                    $entity Entity to retrieve the performance from
      * @param PerformanceMetricFilter[] $metricsFilter Metric filters
      *
      * @return PerformanceSample[]
+     * @throws VsphereUnknownException
      */
     public function getPerformanceRealTime(Entity $entity, array $metricsFilter = [])
     {
@@ -27,9 +27,15 @@ class PerformanceManager extends Model
 
         // Get the performance provider, which contains the real-time interval
         $perfManager = $managedObject->perfManager;
-        $perfProvider = $perfManager->QueryPerfProviderSummary([
-            'entity' => $managedObject->reference
-        ]);
+        try {
+            $perfProvider = $perfManager->QueryPerfProviderSummary([
+                'entity' => $managedObject->reference
+            ]);
+        } catch (\Exception $e) {
+            throw new VsphereUnknownException(
+                'Unknown exception trying to get the performance provider summary: ' . $e->getMessage()
+            );
+        }
 
         return $this->getPerformance($entity, $metricsFilter, null, null, $perfProvider->refreshRate);
     }
@@ -44,13 +50,14 @@ class PerformanceManager extends Model
      * @param int                       $interval Interval in seconds
      *
      * @return PerformanceSample[]
+     * @throws VsphereUnknownException
      */
     public function getPerformance(
         Entity $entity,
         array $metricsFilter = [],
         $startDate = null,
         $endDate = null,
-        $interval = self::DEFAULT_INTERVAL
+        $interval = null
     ) {
         $managedObject = $entity->getManagedObject();
 
@@ -68,19 +75,25 @@ class PerformanceManager extends Model
         );
 
         // Finally query to get the usage
-        $performance = $perfManager->QueryPerf([
-            'querySpec' => [
-                new \PerfQuerySpec(
-                    $managedObject->reference,
-                    $startDate,
-                    $endDate,
-                    null,
-                    $perfMetricIds,
-                    $interval,
-                    null
-                )
-            ]
-        ]);
+        try {
+            $performance = $perfManager->QueryPerf([
+                'querySpec' => [
+                    new \PerfQuerySpec(
+                        $managedObject->reference,
+                        $startDate,
+                        $endDate,
+                        null,
+                        $perfMetricIds,
+                        $interval,
+                        null
+                    )
+                ]
+            ]);
+        } catch (\Exception $e) {
+            throw new VsphereUnknownException(
+                'Unknown exception trying to get the performance: ' . $e->getMessage()
+            );
+        }
 
         if (!empty($performance) && !empty($performance[0])) {
             // [0] references to the first requested querySpec (see QueryPerf call), as we only request one, it will
@@ -132,6 +145,7 @@ class PerformanceManager extends Model
      * @param int|null                  $interval
      *
      * @return array
+     * @throws VsphereUnknownException
      */
     private function getPerfMetricIds(
         $perfManager,
@@ -141,12 +155,18 @@ class PerformanceManager extends Model
         $endDate = null,
         $interval = null
     ) {
-        $perfMetricIds = $perfManager->QueryAvailablePerfMetric([
-            'entity' => $managedObject->reference,
-            'beginTime' => $startDate,
-            'endTime' => $endDate,
-            'intervalId' => $interval
-        ]);
+        try {
+            $perfMetricIds = $perfManager->QueryAvailablePerfMetric([
+                'entity' => $managedObject->reference,
+                'beginTime' => $startDate,
+                'endTime' => $endDate,
+                'intervalId' => $interval
+            ]);
+        } catch (\Exception $e) {
+            throw new VsphereUnknownException(
+                'Unknown exception trying to get the available performance metrics: ' . $e->getMessage()
+            );
+        }
 
         // Convert results into an array of IDs
         $perfMetricIdsInt = [];
@@ -156,20 +176,28 @@ class PerformanceManager extends Model
             }
 
             // Get information about Performance Metrics retrieved above
-            $perfCounters = $perfManager->QueryPerfCounter([
-                'counterId' => $perfMetricIdsInt
-            ]);
+            try {
+                $perfCounters = $perfManager->QueryPerfCounter([
+                    'counterId' => $perfMetricIdsInt
+                ]);
+            } catch (\Exception $e) {
+                throw new VsphereUnknownException(
+                    'Unknown exception trying to get the performance counters information: ' . $e->getMessage()
+                );
+            }
 
             // Filter for the metrics we need to request
             if (!empty($metricsFilter)) {
                 return $this->filterMetrics($perfCounters, $perfMetricIds, $metricsFilter);
             }
+
             return $perfMetricIds;
         }
         return [];
     }
 
     /**
+     * todo: redesign this method with a lower complexity + clean design
      * @param \PerfCounterInfo[]        $perfCounters
      * @param \PerfMetricId[]           $perfMetricIds
      * @param PerformanceMetricFilter[] $metricsFilter

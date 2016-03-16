@@ -5,7 +5,7 @@ This project adds the ability to Symfony and Slim Frameworks to communicate with
 
 It makes use of [our personal and updated fork](https://github.com/LeaseWeb/vmwarephp) of the [vadimcomanescu/vmwarephp](https://github.com/vadimcomanescu/vmwarephp) vSphere API client.
 
-This is still work in progress, a lot has to be done yet, but it is a great start for anyone that needs to interact with vSphere's complex RMI-SOAP API. If you are missing any functionality, feel free to make a pull request. You can find vSphere API documentation [here](http://pubs.vmware.com/vsphere-60/topic/com.vmware.wssdk.apiref.doc/right-pane.html).
+This is not supposed to be a bundle you can just import and use. This is work in progress, a lot has to be done yet, but it is a great start for anyone that needs a code base to interact with vSphere's complex RMI-SOAP API. If you are missing any functionality, feel free to make a pull request. You can find vSphere API documentation [here](http://pubs.vmware.com/vsphere-60/topic/com.vmware.wssdk.apiref.doc/right-pane.html).
 
 # Requirements
 * PHP >= 5.5.
