@@ -2,8 +2,13 @@
 
 namespace Lsw\VsphereClientBundle\Client;
 
+use Lsw\VsphereClientBundle\Entity\Entity;
 use Lsw\VsphereClientBundle\Exception\VsphereObjectNotFoundException;
+use Lsw\VsphereClientBundle\Exception\VsphereUnknownException;
+use Lsw\VsphereClientBundle\Model\PerformanceManager;
 use Lsw\VsphereClientBundle\Model\ResourcePool;
+use Lsw\VsphereClientBundle\Model\VirtualMachine;
+use Lsw\VsphereClientBundle\Util\PerformanceMetricFilter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Vmwarephp\Vhost;
 
@@ -37,15 +42,70 @@ class Client
 
     /**
      * @param $id
-     * @return \Lsw\VsphereClientBundle\Entity\ResourcePool|null
+     * @return \Lsw\VsphereClientBundle\Entity\ResourcePool
+     * @throws VsphereObjectNotFoundException
      */
     public function getResourcePool($id)
     {
+        $resourcePoolModel = new ResourcePool($this->service);
+        return $resourcePoolModel->findById($id);
+    }
+
+    /**
+     * @param $id
+     * @return \Lsw\VsphereClientBundle\Entity\VirtualMachine
+     * @throws VsphereObjectNotFoundException
+     */
+    public function getVirtualMachine($id)
+    {
+        $virtualMachineModel = new VirtualMachine($this->service);
+        return $virtualMachineModel->findById($id);
+    }
+
+    /**
+     * @return \Lsw\VsphereClientBundle\Entity\VirtualMachine[]
+     */
+    public function getVirtualMachines()
+    {
         try {
-            $resourcePoolModel = new ResourcePool($this->service);
-            return $resourcePoolModel->findById($id);
+            $virtualMachineModel = new VirtualMachine($this->service);
+            return $virtualMachineModel->findAll();
         } catch (VsphereObjectNotFoundException $e) {
-            return null;
+            return [];
         }
+    }
+
+    /**
+     * @param Entity                    $entity Entity to retrieve the performance from
+     * @param PerformanceMetricFilter[] $metricsFilter Metric filters
+     *
+     * @return \Lsw\VsphereClientBundle\Entity\PerformanceSample[]
+     * @throws VsphereUnknownException
+     */
+    public function getPerformanceRealTime(Entity $entity, array $metricsFilter = [])
+    {
+        $performanceManagerModel = new PerformanceManager($this->service);
+        return $performanceManagerModel->getPerformanceRealTime($entity, $metricsFilter);
+    }
+
+    /**
+     * @param Entity                    $entity Entity to retrieve the performance from
+     * @param PerformanceMetricFilter[] $metricsFilter Metric filters
+     * @param string                    $startDate Start date in datetime format (eg 2016-03-08T12:00:00Z)
+     * @param string                    $endDate End date in datetime format (eg 2016-03-08T12:00:00Z)
+     * @param int                       $interval Interval in seconds
+     *
+     * @return \Lsw\VsphereClientBundle\Entity\PerformanceSample[]
+     * @throws VsphereUnknownException
+     */
+    public function getPerformance(
+        Entity $entity,
+        array $metricsFilter = [],
+        $startDate = null,
+        $endDate = null,
+        $interval = null
+    ) {
+        $performanceManagerModel = new PerformanceManager($this->service);
+        return $performanceManagerModel->getPerformance($entity, $metricsFilter, $startDate, $endDate, $interval);
     }
 }

@@ -23,7 +23,7 @@ class ResourcePool extends Model
             $resourcePoolResponse = $this->service->findOneManagedObject(
                 'ResourcePool',
                 $id,
-                ['name', 'config', 'resourcePool']
+                ['name', 'config', 'resourcePool', 'vm']
             );
         } catch (\Exception $e) {
             throw new VsphereObjectNotFoundException($e->getMessage());
@@ -40,9 +40,20 @@ class ResourcePool extends Model
         $cpuFree = $cpuAllocated;
         $memoryFree = $memoryAllocated;
         $subResourcePools = $resourcePoolResponse->resourcePool;
-        foreach ($subResourcePools as $subResourcePool) {
-            $cpuFree = $this->substractResource($cpuFree, $subResourcePool->config->cpuAllocation->limit);
-            $memoryFree = $this->substractResource($memoryFree, $subResourcePool->config->memoryAllocation->limit);
+        if (!empty($subResourcePools) && !empty($subResourcePools[0])) {
+            foreach ($subResourcePools as $subResourcePool) {
+                $cpuFree = $this->substractResource($cpuFree, $subResourcePool->config->cpuAllocation->limit);
+                $memoryFree = $this->substractResource($memoryFree, $subResourcePool->config->memoryAllocation->limit);
+            }
+        }
+
+        // Virtual Machine IDs in this Resource Pool
+        $virtualMachines = $resourcePoolResponse->vm;
+        $virtualMachineIds = [];
+        if (!empty($virtualMachines) && !empty($virtualMachines[0])) {
+            foreach ($virtualMachines as $virtualMachine) {
+                $virtualMachineIds[] = $virtualMachine->reference->_;
+            }
         }
 
         // Create the Resource Pool Entity
@@ -53,7 +64,9 @@ class ResourcePool extends Model
             ->setCpuAllocated($cpuAllocated)
             ->setMemoryAllocated($memoryAllocated)
             ->setCpuFree($cpuFree)
-            ->setMemoryFree($memoryFree);
+            ->setMemoryFree($memoryFree)
+            ->setVirtualMachineIds($virtualMachineIds)
+            ->setManagedObject($resourcePoolResponse);
 
         return $resourcePool;
     }
