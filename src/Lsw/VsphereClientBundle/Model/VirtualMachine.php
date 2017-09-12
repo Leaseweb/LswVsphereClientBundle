@@ -58,6 +58,66 @@ class VirtualMachine extends Model
     }
 
     /**
+     * @param string $id
+     * @return mixed
+     * @throws VsphereObjectNotFoundException
+     */
+    public function powerOn($id)
+    {
+        try {
+            $virtualMachineResponse = $this->service->findOneManagedObject(
+                'VirtualMachine',
+                $id,
+                ['name', 'guest']
+            );
+        } catch (\Exception $e) {
+            throw new VsphereObjectNotFoundException($e->getMessage());
+        }
+
+        return $this->service->PowerOnVM_Task($virtualMachineResponse);
+    }
+
+    /**
+     * @param string $id
+     * @return mixed
+     * @throws VsphereObjectNotFoundException
+     */
+    public function powerOff($id)
+    {
+        try {
+            $virtualMachineResponse = $this->service->findOneManagedObject(
+                'VirtualMachine',
+                $id,
+                ['name', 'guest']
+            );
+        } catch (\Exception $e) {
+            throw new VsphereObjectNotFoundException($e->getMessage());
+        }
+
+        return $this->service->PowerOffVM_Task($virtualMachineResponse);
+    }
+
+    /**
+     * @param string $id
+     * @return mixed
+     * @throws VsphereObjectNotFoundException
+     */
+    public function reset($id)
+    {
+        try {
+            $virtualMachineResponse = $this->service->findOneManagedObject(
+                'VirtualMachine',
+                $id,
+                ['name', 'guest']
+            );
+        } catch (\Exception $e) {
+            throw new VsphereObjectNotFoundException($e->getMessage());
+        }
+
+        return $this->service->ResetVM_Task($virtualMachineResponse);
+    }
+
+    /**
      * @param $managedObject
      * @return VirtualMachineEntity
      */
