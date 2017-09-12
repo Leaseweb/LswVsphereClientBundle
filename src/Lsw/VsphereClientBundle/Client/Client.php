@@ -9,6 +9,7 @@ use Lsw\VsphereClientBundle\Model\PerformanceManager;
 use Lsw\VsphereClientBundle\Model\ResourcePool;
 use Lsw\VsphereClientBundle\Model\VirtualMachine;
 use Lsw\VsphereClientBundle\Util\PerformanceMetricFilter;
+use Vmwarephp\ManagedObject;
 use Vmwarephp\Vhost;
 
 /**
@@ -76,7 +77,7 @@ class Client
 
     /**
      * @param string $id
-     * @return mixed
+     * @return ManagedObject
      */
     public function powerOnVirtualMachine($id)
     {
@@ -87,7 +88,7 @@ class Client
 
     /**
      * @param string $id
-     * @return mixed
+     * @return ManagedObject
      */
     public function powerOffVirtualMachine($id)
     {
@@ -98,7 +99,7 @@ class Client
 
     /**
      * @param string $id
-     * @return mixed
+     * @return ManagedObject
      */
     public function resetVirtualMachine($id)
     {

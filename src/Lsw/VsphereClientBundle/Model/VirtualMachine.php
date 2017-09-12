@@ -5,6 +5,7 @@ namespace Lsw\VsphereClientBundle\Model;
 use Lsw\VsphereClientBundle\Entity\GuestNicInfo;
 use Lsw\VsphereClientBundle\Entity\VirtualMachine as VirtualMachineEntity;
 use Lsw\VsphereClientBundle\Exception\VsphereObjectNotFoundException;
+use Vmwarephp\ManagedObject;
 
 /**
  * Class VirtualMachine
@@ -59,7 +60,7 @@ class VirtualMachine extends Model
 
     /**
      * @param string $id
-     * @return mixed
+     * @return ManagedObject
      * @throws VsphereObjectNotFoundException
      */
     public function powerOn($id)
@@ -79,7 +80,7 @@ class VirtualMachine extends Model
 
     /**
      * @param string $id
-     * @return mixed
+     * @return ManagedObject
      * @throws VsphereObjectNotFoundException
      */
     public function powerOff($id)
@@ -99,7 +100,7 @@ class VirtualMachine extends Model
 
     /**
      * @param string $id
-     * @return mixed
+     * @return ManagedObject
      * @throws VsphereObjectNotFoundException
      */
     public function reset($id)
