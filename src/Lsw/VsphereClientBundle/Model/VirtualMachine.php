@@ -5,6 +5,7 @@ namespace Lsw\VsphereClientBundle\Model;
 use Lsw\VsphereClientBundle\Entity\GuestNicInfo;
 use Lsw\VsphereClientBundle\Entity\VirtualMachine as VirtualMachineEntity;
 use Lsw\VsphereClientBundle\Exception\VsphereObjectNotFoundException;
+use Vmwarephp\ManagedObject;
 
 /**
  * Class VirtualMachine
@@ -55,6 +56,66 @@ class VirtualMachine extends Model
             $virtualMachines[] = $this->getVirtualMachineFromManagedObject($virtualMachine);
         }
         return $virtualMachines;
+    }
+
+    /**
+     * @param string $id
+     * @return ManagedObject
+     * @throws VsphereObjectNotFoundException
+     */
+    public function powerOn($id)
+    {
+        try {
+            $virtualMachineResponse = $this->service->findOneManagedObject(
+                'VirtualMachine',
+                $id,
+                ['name', 'guest']
+            );
+        } catch (\Exception $e) {
+            throw new VsphereObjectNotFoundException($e->getMessage());
+        }
+
+        return $this->service->PowerOnVM_Task($virtualMachineResponse);
+    }
+
+    /**
+     * @param string $id
+     * @return ManagedObject
+     * @throws VsphereObjectNotFoundException
+     */
+    public function powerOff($id)
+    {
+        try {
+            $virtualMachineResponse = $this->service->findOneManagedObject(
+                'VirtualMachine',
+                $id,
+                ['name', 'guest']
+            );
+        } catch (\Exception $e) {
+            throw new VsphereObjectNotFoundException($e->getMessage());
+        }
+
+        return $this->service->PowerOffVM_Task($virtualMachineResponse);
+    }
+
+    /**
+     * @param string $id
+     * @return ManagedObject
+     * @throws VsphereObjectNotFoundException
+     */
+    public function reset($id)
+    {
+        try {
+            $virtualMachineResponse = $this->service->findOneManagedObject(
+                'VirtualMachine',
+                $id,
+                ['name', 'guest']
+            );
+        } catch (\Exception $e) {
+            throw new VsphereObjectNotFoundException($e->getMessage());
+        }
+
+        return $this->service->ResetVM_Task($virtualMachineResponse);
     }
 
     /**

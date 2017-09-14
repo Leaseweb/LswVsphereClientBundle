@@ -9,7 +9,7 @@ use Lsw\VsphereClientBundle\Model\PerformanceManager;
 use Lsw\VsphereClientBundle\Model\ResourcePool;
 use Lsw\VsphereClientBundle\Model\VirtualMachine;
 use Lsw\VsphereClientBundle\Util\PerformanceMetricFilter;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Vmwarephp\ManagedObject;
 use Vmwarephp\Vhost;
 
 /**
@@ -73,6 +73,39 @@ class Client
         } catch (VsphereObjectNotFoundException $e) {
             return [];
         }
+    }
+
+    /**
+     * @param string $id
+     * @return ManagedObject
+     */
+    public function powerOnVirtualMachine($id)
+    {
+        $virtualMachineModel = new VirtualMachine($this->service);
+
+        return $virtualMachineModel->powerOn($id);
+    }
+
+    /**
+     * @param string $id
+     * @return ManagedObject
+     */
+    public function powerOffVirtualMachine($id)
+    {
+        $virtualMachineModel = new VirtualMachine($this->service);
+
+        return $virtualMachineModel->powerOff($id);
+    }
+
+    /**
+     * @param string $id
+     * @return ManagedObject
+     */
+    public function resetVirtualMachine($id)
+    {
+        $virtualMachineModel = new VirtualMachine($this->service);
+
+        return $virtualMachineModel->reset($id);
     }
 
     /**
