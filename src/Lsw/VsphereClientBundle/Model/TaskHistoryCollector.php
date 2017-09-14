@@ -6,7 +6,7 @@ use DateTime;
 use Lsw\VsphereClientBundle\Entity\Entity;
 use Lsw\VsphereClientBundle\Entity\TaskHistoryCollector as TaskHistoryCollectorEntity;
 use Lsw\VsphereClientBundle\Entity\TaskInfo;
-use Vmwarephp\ManagedObject;
+use Lsw\VsphereClientBundle\Factory\TaskInfoFactory;
 
 /**
  * Class TaskHistoryCollector
@@ -58,8 +58,8 @@ class TaskHistoryCollector extends Model
 
         $tasks = [];
 
-        foreach ($latestPage as $managedObject) {
-            $tasks[] = $this->getTaskInfoFromManagedObject($managedObject);
+        foreach ($latestPage as $taskInfoObject) {
+            $tasks[] = TaskInfoFactory::buildFromTaskInfoObject($taskInfoObject);
         }
 
         return $tasks;
@@ -67,7 +67,7 @@ class TaskHistoryCollector extends Model
 
     /**
      * @param TaskHistoryCollectorEntity $taskHistoryCollector
-     * @param int|null $maxCount
+     * @param int $maxCount
      * @return TaskInfo[]
      */
     public function readNextPage(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
@@ -76,8 +76,8 @@ class TaskHistoryCollector extends Model
 
         $tasks = [];
 
-        foreach ($nextPage as $managedObject) {
-            $tasks[] = $this->getTaskInfoFromManagedObject($managedObject);
+        foreach ($nextPage as $taskInfoObject) {
+            $tasks[] = TaskInfoFactory::buildFromTaskInfoObject($taskInfoObject);
         }
 
         return $tasks;
@@ -85,7 +85,7 @@ class TaskHistoryCollector extends Model
 
     /**
      * @param TaskHistoryCollectorEntity $taskHistoryCollector
-     * @param int|null $maxCount
+     * @param int $maxCount
      * @return TaskInfo[]
      */
     public function readPreviousPage(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
@@ -94,27 +94,10 @@ class TaskHistoryCollector extends Model
 
         $tasks = [];
 
-        foreach ($nextPage as $managedObject) {
-            $tasks[] = $this->getTaskInfoFromManagedObject($managedObject);
+        foreach ($nextPage as $taskInfoObject) {
+            $tasks[] = TaskInfoFactory::buildFromTaskInfoObject($taskInfoObject);
         }
 
         return $tasks;
-    }
-
-    /**
-     * @param ManagedObject $managedObject
-     * @return TaskInfo
-     */
-    private function getTaskInfoFromManagedObject($managedObject)
-    {
-        $taskInfo = new TaskInfo();
-        $taskInfo->setKey(strval($managedObject->key));
-        $taskInfo->setName(strval($managedObject->name));
-        $taskInfo->setState(strval($managedObject->state));
-        $taskInfo->setProgress(intval($managedObject->progress));
-        $taskInfo->setQueueTime(new DateTime($managedObject->queueTime));
-        $taskInfo->setManagedObject($managedObject);
-
-        return $taskInfo;
     }
 }

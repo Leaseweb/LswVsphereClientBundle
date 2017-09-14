@@ -13,6 +13,9 @@ class TaskInfo extends Entity
     /** @var string $key */
     private $key;
 
+    /** @var Task */
+    private $task;
+
     /** @var string $name */
     private $name;
 
@@ -40,6 +43,24 @@ class TaskInfo extends Entity
     public function setKey($key)
     {
         $this->key = $key;
+        return $this;
+    }
+
+    /**
+     * @return Task
+     */
+    public function getTask()
+    {
+        return $this->task;
+    }
+
+    /**
+     * @param Task $task
+     * @return TaskInfo
+     */
+    public function setTask(Task $task)
+    {
+        $this->task = $task;
         return $this;
     }
 
