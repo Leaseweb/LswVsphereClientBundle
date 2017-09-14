@@ -112,6 +112,7 @@ class TaskHistoryCollector extends Model
         $taskInfo->setName(strval($managedObject->name));
         $taskInfo->setState(strval($managedObject->state));
         $taskInfo->setProgress(intval($managedObject->progress));
+        $taskInfo->setQueueTime(new DateTime($managedObject->queueTime));
         $taskInfo->setManagedObject($managedObject);
 
         return $taskInfo;

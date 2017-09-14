@@ -2,6 +2,8 @@
 
 namespace Lsw\VsphereClientBundle\Entity;
 
+use DateTime;
+
 /**
  * Class TaskInfo
  * @package Lsw\VsphereClientBundle\Entity
@@ -19,6 +21,9 @@ class TaskInfo extends Entity
 
     /** @var int $progress */
     private $progress;
+
+    /** @var DateTime $queueTime */
+    private $queueTime;
 
     /**
      * @return string
@@ -89,6 +94,24 @@ class TaskInfo extends Entity
     public function setProgress($progress)
     {
         $this->progress = $progress;
+        return $this;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getQueueTime()
+    {
+        return $this->queueTime;
+    }
+
+    /**
+     * @param DateTime $queueTime
+     * @return TaskInfo
+     */
+    public function setQueueTime(DateTime $queueTime)
+    {
+        $this->queueTime = $queueTime;
         return $this;
     }
 }
