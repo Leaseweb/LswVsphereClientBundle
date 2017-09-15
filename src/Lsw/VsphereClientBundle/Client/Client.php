@@ -2,11 +2,15 @@
 
 namespace Lsw\VsphereClientBundle\Client;
 
+use DateTime;
 use Lsw\VsphereClientBundle\Entity\Entity;
+use Lsw\VsphereClientBundle\Entity\TaskHistoryCollector as TaskHistoryCollectorEntity;
+use Lsw\VsphereClientBundle\Entity\TaskInfo;
 use Lsw\VsphereClientBundle\Exception\VsphereObjectNotFoundException;
 use Lsw\VsphereClientBundle\Exception\VsphereUnknownException;
 use Lsw\VsphereClientBundle\Model\PerformanceManager;
 use Lsw\VsphereClientBundle\Model\ResourcePool;
+use Lsw\VsphereClientBundle\Model\TaskHistoryCollector;
 use Lsw\VsphereClientBundle\Model\VirtualMachine;
 use Lsw\VsphereClientBundle\Util\PerformanceMetricFilter;
 use Vmwarephp\ManagedObject;
@@ -140,5 +144,64 @@ class Client
     ) {
         $performanceManagerModel = new PerformanceManager($this->service);
         return $performanceManagerModel->getPerformance($entity, $metricsFilter, $startDate, $endDate, $interval);
+    }
+
+    /**
+     * @param Entity $entity
+     * @param DateTime|null $beginTime
+     * @param DateTime|null $endTime
+     * @param string $recursion
+     * @param string $timeType
+     * @return TaskHistoryCollectorEntity
+     */
+    public function getTaskHistoryCollectorByEntityAndTime(
+        Entity $entity,
+        DateTime $beginTime = null,
+        DateTime $endTime = null,
+        $recursion = 'self',
+        $timeType = 'queuedTime'
+    ) {
+        $taskHistoryCollectorModel = new TaskHistoryCollector($this->service);
+
+        return $taskHistoryCollectorModel->getTaskHistoryCollector(
+            $entity,
+            $recursion,
+            $beginTime,
+            $endTime,
+            $timeType
+        );
+    }
+
+    /**
+     * @param TaskHistoryCollectorEntity $taskHistoryCollector
+     * @return TaskInfo[]
+     */
+    public function getTasksLatestPage(TaskHistoryCollectorEntity $taskHistoryCollector)
+    {
+        $taskHistoryCollectorModel = new TaskHistoryCollector($this->service);
+
+        return $taskHistoryCollectorModel->getLatestPage($taskHistoryCollector);
+    }
+
+    /**
+     * @param TaskHistoryCollectorEntity $taskHistoryCollector
+     * @return TaskInfo[]
+     */
+    public function getTasksNextPage(TaskHistoryCollectorEntity $taskHistoryCollector)
+    {
+        $taskHistoryCollectorModel = new TaskHistoryCollector($this->service);
+
+        return $taskHistoryCollectorModel->readNextPage($taskHistoryCollector);
+    }
+
+    /**
+     * @param TaskHistoryCollectorEntity $taskHistoryCollector
+     * @return TaskInfo[]
+     */
+    public function getTasksPreviousPage(TaskHistoryCollectorEntity $taskHistoryCollector)
+    {
+        $taskHistoryCollectorModel = new TaskHistoryCollector($this->service);
+
+        return $taskHistoryCollectorModel->readPreviousPage($taskHistoryCollector);
     }
 }
