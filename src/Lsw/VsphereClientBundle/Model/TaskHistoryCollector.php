@@ -58,8 +58,10 @@ class TaskHistoryCollector extends Model
 
         $tasks = [];
 
-        foreach ($latestPage as $taskInfoObject) {
-            $tasks[] = TaskInfoFactory::buildFromTaskInfoObject($taskInfoObject);
+        if (is_array($latestPage)) {
+            foreach ($latestPage as $taskInfoObject) {
+                $tasks[] = TaskInfoFactory::buildFromTaskInfoObject($taskInfoObject);
+            }
         }
 
         return $tasks;
