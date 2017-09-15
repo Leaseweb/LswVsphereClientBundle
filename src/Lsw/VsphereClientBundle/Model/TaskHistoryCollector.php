@@ -51,7 +51,7 @@ class TaskHistoryCollector extends Model
     /**
      * @param TaskHistoryCollectorEntity $taskHistoryCollector
      * @param int $maxCount
-     * @return array
+     * @return TaskInfo[]
      */
     public function getLatestPage(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
     {
