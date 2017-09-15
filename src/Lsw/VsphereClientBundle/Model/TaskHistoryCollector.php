@@ -50,11 +50,15 @@ class TaskHistoryCollector extends Model
 
     /**
      * @param TaskHistoryCollectorEntity $taskHistoryCollector
-     * @return TaskInfo[]
+     * @param int $maxCount
+     * @return array
      */
-    public function getLatestPage(TaskHistoryCollectorEntity $taskHistoryCollector)
+    public function getLatestPage(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
     {
-        $latestPage = $taskHistoryCollector->getManagedObject()->getLatestPage();
+        $managedObject = $taskHistoryCollector->getManagedObject();
+        $managedObject->SetCollectorPageSize(['maxCount' => intval($maxCount)]);
+
+        $latestPage = $managedObject->getLatestPage();
 
         $tasks = [];
 

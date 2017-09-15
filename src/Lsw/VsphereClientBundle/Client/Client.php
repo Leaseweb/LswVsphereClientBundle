@@ -174,13 +174,14 @@ class Client
 
     /**
      * @param TaskHistoryCollectorEntity $taskHistoryCollector
+     * @param int $maxCount
      * @return TaskInfo[]
      */
-    public function getLatestTasks(TaskHistoryCollectorEntity $taskHistoryCollector)
+    public function getLatestTasks(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
     {
         $taskHistoryCollectorModel = new TaskHistoryCollector($this->service);
 
-        return $taskHistoryCollectorModel->getLatestPage($taskHistoryCollector);
+        return $taskHistoryCollectorModel->getLatestPage($taskHistoryCollector, $maxCount);
     }
 
     /**

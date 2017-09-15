@@ -56,7 +56,13 @@ class TaskHistoryCollectorTest extends AbstractTest
         $taskInfo->queueTime = '2017-09-14T10:23:35.052999Z';
 
         $managedObjectMock = $this->createMock(ManagedObject::class);
-        $managedObjectMock->expects($this->once())
+        $managedObjectMock->expects($this->at(0))
+            ->method('__call')
+            ->with(
+                $this->equalTo('SetCollectorPageSize'),
+                $this->equalTo([0 => ['maxCount' => 100]])
+            );
+        $managedObjectMock->expects($this->at(1))
             ->method('__call')
             ->with($this->equalTo('getLatestPage'))
             ->willReturn([$taskInfo]);
@@ -67,7 +73,7 @@ class TaskHistoryCollectorTest extends AbstractTest
         $serviceMock = $this->createMock(Service::class);
 
         $taskHistoryCollectorModel = new TaskHistoryCollector($serviceMock);
-        $tasks = $taskHistoryCollectorModel->getLatestPage($taskHistoryCollector);
+        $tasks = $taskHistoryCollectorModel->getLatestPage($taskHistoryCollector, 100);
 
         $this->assertCount(1, $tasks);
         $this->assertInstanceOf(TaskInfo::class, $tasks[0]);
@@ -93,7 +99,10 @@ class TaskHistoryCollectorTest extends AbstractTest
         $managedObjectMock = $this->createMock(ManagedObject::class);
         $managedObjectMock->expects($this->once())
             ->method('__call')
-            ->with($this->equalTo('ReadNextTasks'))
+            ->with(
+                $this->equalTo('ReadNextTasks'),
+                $this->equalTo([0 => ['maxCount' => 10]])
+            )
             ->willReturn([$taskInfo]);
 
         $taskHistoryCollector = new TaskHistoryCollectorEntity();
@@ -123,7 +132,10 @@ class TaskHistoryCollectorTest extends AbstractTest
         $managedObjectMock = $this->createMock(ManagedObject::class);
         $managedObjectMock->expects($this->once())
             ->method('__call')
-            ->with($this->equalTo('ReadPreviousTasks'))
+            ->with(
+                $this->equalTo('ReadPreviousTasks'),
+                $this->equalTo([0 => ['maxCount' => 10]])
+            )
             ->willReturn([$taskInfo]);
 
         $taskHistoryCollector = new TaskHistoryCollectorEntity();
