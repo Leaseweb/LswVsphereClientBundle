@@ -50,16 +50,22 @@ class TaskHistoryCollector extends Model
 
     /**
      * @param TaskHistoryCollectorEntity $taskHistoryCollector
+     * @param int $maxCount
      * @return TaskInfo[]
      */
-    public function getLatestPage(TaskHistoryCollectorEntity $taskHistoryCollector)
+    public function getLatestPage(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
     {
-        $latestPage = $taskHistoryCollector->getManagedObject()->getLatestPage();
+        $managedObject = $taskHistoryCollector->getManagedObject();
+        $managedObject->SetCollectorPageSize(['maxCount' => intval($maxCount)]);
+
+        $latestPage = $managedObject->getLatestPage();
 
         $tasks = [];
 
-        foreach ($latestPage as $taskInfoObject) {
-            $tasks[] = TaskInfoFactory::buildFromTaskInfoObject($taskInfoObject);
+        if (is_array($latestPage)) {
+            foreach ($latestPage as $taskInfoObject) {
+                $tasks[] = TaskInfoFactory::buildFromTaskInfoObject($taskInfoObject);
+            }
         }
 
         return $tasks;
@@ -70,14 +76,16 @@ class TaskHistoryCollector extends Model
      * @param int $maxCount
      * @return TaskInfo[]
      */
-    public function readNextPage(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
+    public function readNextTasks(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
     {
-        $nextPage = $taskHistoryCollector->getManagedObject()->ReadNextTasks(['maxCount' => intval($maxCount)]);
+        $nextTasks = $taskHistoryCollector->getManagedObject()->ReadNextTasks(['maxCount' => intval($maxCount)]);
 
         $tasks = [];
 
-        foreach ($nextPage as $taskInfoObject) {
-            $tasks[] = TaskInfoFactory::buildFromTaskInfoObject($taskInfoObject);
+        if (is_array($nextTasks)) {
+            foreach ($nextTasks as $taskInfoObject) {
+                $tasks[] = TaskInfoFactory::buildFromTaskInfoObject($taskInfoObject);
+            }
         }
 
         return $tasks;
@@ -88,14 +96,18 @@ class TaskHistoryCollector extends Model
      * @param int $maxCount
      * @return TaskInfo[]
      */
-    public function readPreviousPage(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
+    public function readPreviousTasks(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
     {
-        $nextPage = $taskHistoryCollector->getManagedObject()->ReadPreviousTasks(['maxCount' => intval($maxCount)]);
+        $previousTasks = $taskHistoryCollector
+            ->getManagedObject()
+            ->ReadPreviousTasks(['maxCount' => intval($maxCount)]);
 
         $tasks = [];
 
-        foreach ($nextPage as $taskInfoObject) {
-            $tasks[] = TaskInfoFactory::buildFromTaskInfoObject($taskInfoObject);
+        if (is_array($previousTasks)) {
+            foreach ($previousTasks as $taskInfoObject) {
+                $tasks[] = TaskInfoFactory::buildFromTaskInfoObject($taskInfoObject);
+            }
         }
 
         return $tasks;

@@ -174,34 +174,37 @@ class Client
 
     /**
      * @param TaskHistoryCollectorEntity $taskHistoryCollector
+     * @param int $maxCount
      * @return TaskInfo[]
      */
-    public function getTasksLatestPage(TaskHistoryCollectorEntity $taskHistoryCollector)
+    public function getLatestTasks(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
     {
         $taskHistoryCollectorModel = new TaskHistoryCollector($this->service);
 
-        return $taskHistoryCollectorModel->getLatestPage($taskHistoryCollector);
+        return $taskHistoryCollectorModel->getLatestPage($taskHistoryCollector, $maxCount);
     }
 
     /**
      * @param TaskHistoryCollectorEntity $taskHistoryCollector
+     * @param int $maxCount
      * @return TaskInfo[]
      */
-    public function getTasksNextPage(TaskHistoryCollectorEntity $taskHistoryCollector)
+    public function readNextTasks(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
     {
         $taskHistoryCollectorModel = new TaskHistoryCollector($this->service);
 
-        return $taskHistoryCollectorModel->readNextPage($taskHistoryCollector);
+        return $taskHistoryCollectorModel->readNextTasks($taskHistoryCollector, $maxCount);
     }
 
     /**
      * @param TaskHistoryCollectorEntity $taskHistoryCollector
+     * @param int $maxCount
      * @return TaskInfo[]
      */
-    public function getTasksPreviousPage(TaskHistoryCollectorEntity $taskHistoryCollector)
+    public function readPreviousTasks(TaskHistoryCollectorEntity $taskHistoryCollector, $maxCount = 10)
     {
         $taskHistoryCollectorModel = new TaskHistoryCollector($this->service);
 
-        return $taskHistoryCollectorModel->readPreviousPage($taskHistoryCollector);
+        return $taskHistoryCollectorModel->readPreviousTasks($taskHistoryCollector, $maxCount);
     }
 }
